@@ -7,11 +7,16 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   // Field
+  String name, email, password;
+  final formKey = GlobalKey<FormState>();
 
   // Method
   Widget nameText() {
     Color color = Colors.green.shade800;
     return TextFormField(
+      onSaved: (value) {
+        name = value;
+      },
       decoration: InputDecoration(
         icon: Icon(
           Icons.face,
@@ -30,6 +35,9 @@ class _RegisterState extends State<Register> {
   Widget emailText() {
     Color color = Colors.purple.shade700;
     return TextFormField(
+      onSaved: (value) {
+        email = value;
+      },
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         icon: Icon(
@@ -47,8 +55,11 @@ class _RegisterState extends State<Register> {
   }
 
   Widget passwordText() {
-    Color color = Colors.yellow.shade900;
+    Color color = Colors.white;
     return TextFormField(
+      onSaved: (value) {
+        password = value;
+      },
       decoration: InputDecoration(
         icon: Icon(
           Icons.lock,
@@ -67,7 +78,10 @@ class _RegisterState extends State<Register> {
   Widget registerButton() {
     return IconButton(
       icon: Icon(Icons.cloud_upload),
-      onPressed: () {},
+      onPressed: () {
+        formKey.currentState.save();
+        print('name = $name, email = $email, password = $password');
+      },
     );
   }
 
@@ -83,16 +97,20 @@ class _RegisterState extends State<Register> {
         decoration: BoxDecoration(
           gradient: RadialGradient(
             colors: [Colors.white, Colors.blue.shade800],
-            radius: 1.4,center: Alignment.topCenter,
+            radius: 1.4,
+            center: Alignment.topCenter,
           ),
         ),
-        child: ListView(
-          padding: EdgeInsets.all(30.0),
-          children: <Widget>[
-            nameText(),
-            emailText(),
-            passwordText(),
-          ],
+        child: Form(
+          key: formKey,
+          child: ListView(
+            padding: EdgeInsets.all(30.0),
+            children: <Widget>[
+              nameText(),
+              emailText(),
+              passwordText(),
+            ],
+          ),
         ),
       ),
     );
