@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:ungpop/screens/my_service.dart';
 import 'package:ungpop/screens/register.dart';
 
 class Home extends StatefulWidget {
@@ -10,6 +12,29 @@ class _HomeState extends State<Home> {
   // Field
 
   // Method
+  @override
+  void initState(){
+    super.initState();
+    checkStatus();
+  }
+
+  Future<void> checkStatus()async{
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+    if (firebaseUser != null) {
+      myRouteToService();
+    }
+  }
+
+  void myRouteToService(){
+    MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext context){return MyService();});
+    Navigator.of(context).pushAndRemoveUntil(materialPageRoute, (Route<dynamic> route){return false;});
+  }
+
+
+
+
+
   Widget signInButton() {
     return RaisedButton(
       shape: RoundedRectangleBorder(
