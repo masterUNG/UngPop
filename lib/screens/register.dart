@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ungpop/screens/my_service.dart';
+import 'package:ungpop/utility/normal_dialog.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -81,8 +84,37 @@ class _RegisterState extends State<Register> {
       onPressed: () {
         formKey.currentState.save();
         print('name = $name, email = $email, password = $password');
+        registerThread();
       },
     );
+  }
+
+  Future<void> registerThread() async {
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    await firebaseAuth
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((authResult) {
+          print('Register Success');
+          setUpDisplayName();
+        }).catchError((error){
+          String title = error.code;
+          String message = error.message;
+          print('title = $title, message = $message');
+          normalDialog(context, title, message);
+        });
+  }
+
+  Future<void> setUpDisplayName()async{
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    FirebaseUser firebaseUser = await firebaseAuth.currentUser();
+    UserUpdateInfo userUpdateInfo = UserUpdateInfo();
+    userUpdateInfo.displayName = name;
+    firebaseUser.updateProfile(userUpdateInfo);
+
+    MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext context){return MyService();});
+    Navigator.of(context).pushAndRemoveUntil(materialPageRoute, (Route<dynamic> route){return false;});
+
+
   }
 
   @override
