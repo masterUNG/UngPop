@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ungpop/screens/my_service.dart';
 import 'package:ungpop/screens/register.dart';
+import 'package:ungpop/utility/normal_dialog.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -10,15 +11,17 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   // Field
+  String email, password;
+  final formKey = GlobalKey<FormState>();
 
   // Method
   @override
-  void initState(){
+  void initState() {
     super.initState();
     checkStatus();
   }
 
-  Future<void> checkStatus()async{
+  Future<void> checkStatus() async {
     FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     FirebaseUser firebaseUser = await firebaseAuth.currentUser();
     if (firebaseUser != null) {
@@ -26,14 +29,16 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void myRouteToService(){
-    MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext context){return MyService();});
-    Navigator.of(context).pushAndRemoveUntil(materialPageRoute, (Route<dynamic> route){return false;});
+  void myRouteToService() {
+    MaterialPageRoute materialPageRoute =
+        MaterialPageRoute(builder: (BuildContext context) {
+      return MyService();
+    });
+    Navigator.of(context).pushAndRemoveUntil(materialPageRoute,
+        (Route<dynamic> route) {
+      return false;
+    });
   }
-
-
-
-
 
   Widget signInButton() {
     return RaisedButton(
@@ -45,8 +50,22 @@ class _HomeState extends State<Home> {
         'Sign In',
         style: TextStyle(color: Colors.white),
       ),
-      onPressed: () {},
+      onPressed: () {
+        formKey.currentState.save();
+        checkAuthen();
+      },
     );
+  }
+
+  Future<void> checkAuthen() async {
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    await firebaseAuth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((response) {
+      myRouteToService();
+    }).catchError((error) {
+      normalDialog(context, '${error.code}', '${error.message}');
+    });
   }
 
   Widget signUpButton() {
@@ -62,9 +81,11 @@ class _HomeState extends State<Home> {
       onPressed: () {
         print('You Click SignUp');
 
-        MaterialPageRoute materialPageRoute = MaterialPageRoute(builder: (BuildContext context){return Register();});
+        MaterialPageRoute materialPageRoute =
+            MaterialPageRoute(builder: (BuildContext context) {
+          return Register();
+        });
         Navigator.of(context).push(materialPageRoute);
-
       },
     );
   }
@@ -86,6 +107,9 @@ class _HomeState extends State<Home> {
     return Container(
       width: 250.0,
       child: TextFormField(
+        onSaved: (value) {
+          email = value;
+        },
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           icon: Icon(
@@ -103,6 +127,10 @@ class _HomeState extends State<Home> {
     return Container(
       width: 250.0,
       child: TextFormField(
+        onSaved: (value) {
+          password = value;
+        },
+        obscureText: true,
         keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           icon: Icon(
@@ -157,18 +185,21 @@ class _HomeState extends State<Home> {
               padding: EdgeInsets.all(18.0),
               // color: Color.fromARGB(180, 255, 255, 255),
               child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    showLogo(),
-                    showAppName(),
-                    userText(),
-                    passwordText(),
-                    SizedBox(
-                      height: 8.0,
-                    ),
-                    showButton(),
-                  ],
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      showLogo(),
+                      showAppName(),
+                      userText(),
+                      passwordText(),
+                      SizedBox(
+                        height: 8.0,
+                      ),
+                      showButton(),
+                    ],
+                  ),
                 ),
               ),
             ),
