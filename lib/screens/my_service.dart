@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ungpop/screens/home.dart';
+import 'package:ungpop/widget/info.dart';
+import 'package:ungpop/widget/show_product_list.dart';
 
 class MyService extends StatefulWidget {
   @override
@@ -10,6 +12,7 @@ class MyService extends StatefulWidget {
 class _MyServiceState extends State<MyService> {
   // Field
   String login = '...';
+  Widget currentWidget = ShowProductList();
 
   // Method
   @override
@@ -21,9 +24,12 @@ class _MyServiceState extends State<MyService> {
   Widget menuPage1() {
     return ListTile(
       leading: Icon(Icons.filter_1),
-      title: Text('Page 1'),
+      title: Text('Show Product List'),
       subtitle: Text('Description of Page 1'),
       onTap: () {
+        setState(() {
+          currentWidget = ShowProductList();
+        });
         Navigator.of(context).pop();
       },
     );
@@ -35,6 +41,9 @@ class _MyServiceState extends State<MyService> {
       title: Text('Page 2'),
       subtitle: Text('Description of Page 2'),
       onTap: () {
+        setState(() {
+          currentWidget = Info();
+        });
         Navigator.of(context).pop();
       },
     );
@@ -127,7 +136,7 @@ class _MyServiceState extends State<MyService> {
       appBar: AppBar(
         title: Text('My Service'),
       ),
-      body: Text('body'),
+      body: currentWidget,
       drawer: showDrawer(),
     );
   }
